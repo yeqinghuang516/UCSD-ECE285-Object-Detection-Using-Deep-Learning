@@ -9,6 +9,7 @@ from torch.autograd import Variable
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
+from matplotlib.ticker import NullLocator
 
 
 def to_cpu(tensor):
@@ -323,3 +324,77 @@ def build_targets(pred_boxes, pred_cls, target, anchors, ignore_thres):
 
     def arsinh(self, x):
         return torch.log(1 + torch.sqrt(1 + x ** 2))
+    
+    
+    
+def Detect(image, model):
+  classes = ['aeroplane', 'bicycle', 'bird', 'boat', 'bottle', 'bus', 'car', 'cat', 'chair', 'cow', 'diningtable', 'dog', 'horse', 'motorbike', 'person', 'pottedplant', 'sheep', 'sofa', 'train', 'tvmonitor']
+  transform = tv.transforms.Compose([tv.transforms.Resize((img_size, img_size)),tv.transforms.ToTensor(),tv.transforms.Normalize(mean=[0.5, 0.5, 0.5],std=[0.5, 0.5, 0.5])])
+  model.eval()
+
+  Tensor = torch.cuda.FloatTensor if torch.cuda.is_available() else torch.FloatTensor
+  imgs = []  # Stores image paths
+  img_detections = []  # Stores detections for each image index
+  print("\nPerforming object detection:")
+
+  h, w = image.size
+  dim_diff = np.abs(h - w)
+  pad1, pad2 = dim_diff // 2, dim_diff - dim_diff // 2
+  pad = (0, pad1, 0, pad2) if h >= w else (pad1, 0, pad2, 0)   # left, top, right and bottom# Add padding
+  image = tv.transforms.functional.pad(image, pad,fill = 0, padding_mode = 'constant' )
+  input_imgs = transform(image)
+  input_imgs = input_imgs[None,:,:,:].to(device)
+  input_imgs = Variable(input_imgs)
+
+  # Get detections
+  with torch.no_grad():
+      detections = model(input_imgs)
+      detections = non_max_suppression(detections, conf_thres, nms_thres)
+
+  # Bounding-box colors
+  cmap = plt.get_cmap("tab20b")
+  colors = [cmap(i) for i in np.linspace(0, 1, 20)]
+
+  # Create plot
+  img = np.array(image)
+  plt.figure()
+  fig, ax = plt.subplots(1, figsize = (12, 12))
+  ax.imshow(img)
+
+  detections = detections[0]
+
+  # Draw bounding boxes and labels of detections
+  if detections is not None:
+      # Rescale boxes to original image
+      detections = rescale_boxes(detections, img_size, img.shape[:2])
+
+      unique_labels = detections[:, -1].cpu().unique()
+      n_cls_preds = len(unique_labels)
+      bbox_colors = random.sample(colors, n_cls_preds)
+      for x1, y1, x2, y2, conf, cls_conf, cls_pred in detections:
+
+          print("\t+ Label: %s, Conf: %.5f" % (classes[int(cls_pred)], cls_conf.item()))
+
+          box_w = x2 - x1
+          box_h = y2 - y1
+
+          color = bbox_colors[int(np.where(unique_labels == int(cls_pred))[0])]
+          # Create a Rectangle patch
+          bbox = patches.Rectangle((x1, y1), box_w, box_h, linewidth= 4, edgecolor= color, facecolor="none")
+          # Add the bbox to the plot
+          ax.add_patch(bbox)
+          # Add label
+          plt.text(
+              x1,
+              y1,
+              fontsize = 12,
+              s=classes[int(cls_pred)] + ' ' + ('%.4f' % cls_conf) ,
+              color="white",
+              verticalalignment="top",
+              bbox={"color": color, "pad": 0},
+          )
+
+  plt.axis("off")
+  plt.gca().xaxis.set_major_locator(NullLocator())
+  plt.gca().yaxis.set_major_locator(NullLocator())
+  plt.show()
