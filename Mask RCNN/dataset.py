@@ -3,6 +3,7 @@ import torchvision as tv
 import skimage
 import transforms as T
 import os
+import numpy as np
 
 class VOCDataset(td.Dataset):
 
