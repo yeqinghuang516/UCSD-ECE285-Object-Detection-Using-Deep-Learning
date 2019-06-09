@@ -331,6 +331,9 @@ def build_targets(pred_boxes, pred_cls, target, anchors, ignore_thres):
 def Detect(image, model):
   classes = ['aeroplane', 'bicycle', 'bird', 'boat', 'bottle', 'bus', 'car', 'cat', 'chair', 'cow', 'diningtable', 'dog', 'horse', 'motorbike', 'person', 'pottedplant', 'sheep', 'sofa', 'train', 'tvmonitor']
   img_size = 224
+  conf_thres = 0.8 # confidence threshold
+  nms_thres = 0.5 # non-maximum-suppression threshold
+  device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
   transform = tv.transforms.Compose([tv.transforms.Resize((img_size, img_size)),tv.transforms.ToTensor(),tv.transforms.Normalize(mean=[0.5, 0.5, 0.5],std=[0.5, 0.5, 0.5])])
   model.eval()
 
