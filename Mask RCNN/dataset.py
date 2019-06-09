@@ -4,6 +4,7 @@ import skimage
 import transforms as T
 import os
 import numpy as np
+import torch
 
 class VOCDataset(td.Dataset):
 
