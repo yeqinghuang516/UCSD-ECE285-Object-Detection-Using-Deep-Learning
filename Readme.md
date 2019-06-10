@@ -27,7 +27,7 @@ All notebooks are highly suggested to run on Google Colab, simply select "Run Al
 
 #### Precision-Recall curves after each procedure
 
-<p align="center"><img src = "assets\pre-recall.png" width = "400px">
+<img src = "assets\pre-recall.png" width = "400px">
 
 For more detailed results, please see the report
 
