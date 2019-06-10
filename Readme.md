@@ -4,7 +4,7 @@ This is a course project for UCSD ECE285: Machine learning for image processing
 
 In this project, we implement a representative multi-object detection algorithm: YOLOv3, and conduct a series of optimization and exploration to improve its performance, including image padding, data augmentation, multi-scale training, modifying loss function, modifying activation function and comparison with another object detection algorithm: Mask R-CNN. After those procedures, We provide a detailed analysis of their performance.
 
-<img src= "assets\WhatWeDid.png" width = '500px' >
+<p align="center"><img src= "assets\WhatWeDid.png" width = '500px' >
 
 ### About the code
 
@@ -26,7 +26,7 @@ All notebooks are highly suggested to run on Google Colab, simply select "Run Al
 
 #### Precision-Recall curves after each procedure
 
-<img src = "assets\pre-recall.png" width = "400px">
+<p align="center"><img src = "assets\pre-recall.png" width = "400px">
 
 For more detailed results, please see the report
 
